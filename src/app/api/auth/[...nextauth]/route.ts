@@ -1,7 +1,8 @@
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { NextAuthOptions } from "next-auth";
 
-export const authOptions: AuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -14,21 +15,19 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        // Dummy credentials
         const DUMMY_USER = {
-          username: "admin",
-          password: "123",
           id: "1",
           name: "Admin",
           email: "admin@example.com",
+          username: "admin",
+          password: "123",
         };
 
-        // Validate user
         if (credentials.username === DUMMY_USER.username && credentials.password === DUMMY_USER.password) {
           return { id: DUMMY_USER.id, name: DUMMY_USER.name, email: DUMMY_USER.email };
         }
 
-        throw new Error("Invalid credentials"); // If authentication fails
+        throw new Error("Invalid credentials");
       },
     }),
   ],
@@ -36,10 +35,11 @@ export const authOptions: AuthOptions = {
     signIn: "/login",
   },
   session: {
-    strategy: "jwt" as "jwt", // Explicitly set the type
+    strategy: "jwt",
   },
-  secret: "your-secret-key",
+  secret: process.env.NEXTAUTH_SECRET || "your-secret-key",
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };

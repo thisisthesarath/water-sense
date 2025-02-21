@@ -21,7 +21,7 @@ export async function OverviewCardsGroup() {
         label="Solved Alerts"
         data={{
           ...profit,
-          value: "$" + compactFormat(profit.value),
+          value: "" + compactFormat(profit.value),
         }}
         Icon={icons.Profit}
       />
@@ -36,7 +36,7 @@ export async function OverviewCardsGroup() {
       />
 
       <OverviewCard
-        label="Total Users"
+        label="Total Reports"
         data={{
           ...users,
           value: compactFormat(users.value),

@@ -11,7 +11,7 @@ export const NAV_DATA = [
         items: [],
       },
       {
-        title: "To be Reviewed",
+        title: "To be Solved",
         url: "/tables",
         icon: Icons.Table,
         items: [
@@ -21,19 +21,19 @@ export const NAV_DATA = [
           // },
         ],
       },
+      // {
+      //   title: "All Alerts",
+      //   url: "/allalerts",
+      //   icon: Icons.Table,
+      //   items: [
+      //     // {
+      //     //   title: "Tables",
+      //     //   url: "/tables",
+      //     // },
+      //   ],
+      // },
       {
-        title: "All Alerts",
-        url: "/allalerts",
-        icon: Icons.Table,
-        items: [
-          // {
-          //   title: "Tables",
-          //   url: "/tables",
-          // },
-        ],
-      },
-      {
-        title: "All Reports",
+        title: "All Reports / Database",
         url: "/allreports",
         icon: Icons.Table,
         items: [

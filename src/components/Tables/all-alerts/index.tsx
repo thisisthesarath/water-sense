@@ -32,8 +32,6 @@ export function AlertsTable({ className }: { className?: string }) {
       reportedTime: "2025-02-10 15:00",
       pH: 7.2,
       turbidity: 5.6,
-      orp: 300,
-      tss: 25,
       ds: 150,
       review: "Review solved",
     },
@@ -47,8 +45,6 @@ export function AlertsTable({ className }: { className?: string }) {
       reportedTime: "2025-02-10 15:00",
       pH: 7.2,
       turbidity: 5.6,
-      orp: 300,
-      tss: 25,
       ds: 150,
       review: "Review solved",
     },
@@ -126,9 +122,7 @@ export function AlertsTable({ className }: { className?: string }) {
                 <p><strong>Reviewed By:</strong> {selectedAlert.reviewedBy}</p>
                 <p><strong>pH:</strong> {selectedAlert.pH}</p>
                 <p><strong>Turbidity:</strong> {selectedAlert.turbidity}</p>
-                <p><strong>ORP:</strong> {selectedAlert.orp}</p>
-                <p><strong>TSS:</strong> {selectedAlert.tss}</p>
-                <p><strong>DS:</strong> {selectedAlert.ds}</p>
+                <p><strong>TDS:</strong> {selectedAlert.ds}</p>
               </div>
               <label className="block text-sm font-medium text-gray-700">Review</label>
               <Input value={review} onChange={(e) => setReview(e.target.value)} className="mb-3" />

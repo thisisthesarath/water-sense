@@ -4,13 +4,13 @@ export async function getOverviewData() {
 
   return {
     views: {
-      value: 3456,
+      value: 50,
     },
     profit: {
-      value: 4220,
+      value: 45,
     },
     products: {
-      value: 3456,
+      value: 5,
     },
     users: {
       value: 3456,

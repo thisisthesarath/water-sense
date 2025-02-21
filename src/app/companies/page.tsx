@@ -6,10 +6,6 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 const companies = [
   { id: 1, company: "ABC Industries", location: "Chennai" },
-  { id: 2, company: "XYZ Corp", location: "Mumbai" },
-  { id: 3, company: "PQR Ltd", location: "Delhi" },
-  { id: 4, company: "LMN Pvt Ltd", location: "Bangalore" },
-  { id: 5, company: "EFG Enterprises", location: "Hyderabad" },
 ];
 
 const CompaniesPage = () => {

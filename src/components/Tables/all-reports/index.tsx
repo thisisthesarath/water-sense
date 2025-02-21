@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -21,68 +21,48 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export function AlertsTable({ className }: { className?: string }) {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      company: "ABC Industries",
-      location: "Chennai",
-      status: "Reviewed",
-      reviewedBy: "Sarath",
-      alertedTime: "2025-02-10 14:30",
-      pH: 7.2,
-      turbidity: 5.6,
-      orp: 300,
-      tss: 25,
-      ds: 150,
-      review: "Review solved",
-      result: "Polluted",
-    },
-    {
-      id: 2,
-      company: "XYZ Chemicals",
-      location: "Mumbai",
-      status: "Under Review",
-      reviewedBy: "-",
-      alertedTime: "2025-02-09 12:15",
-      pH: 6.8,
-      turbidity: 4.2,
-      orp: 320,
-      tss: 20,
-      ds: 140,
-      review: "Pending",
-      result: "Non-Polluted",
-    },
-    {
-      id: 3,
-      company: "GreenTech Pvt Ltd",
-      location: "Bangalore",
-      status: "Pending",
-      reviewedBy: "-",
-      alertedTime: "2025-02-08 08:45",
-      pH: 7.5,
-      turbidity: 3.9,
-      orp: 310,
-      tss: 18,
-      ds: 135,
-      review: "-",
-      result: "Polluted",
-    },
-  ]);
-
+  const [data, setData] = useState<any[]>([]);
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [review, setReview] = useState("");
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://server-water-sense.onrender.com/tlava/all");
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log("Fetched Data:", result);
+
+        if (Array.isArray(result)) {
+          setData(result);
+        } else if (result && Array.isArray(result.data)) {
+          setData(result.data);
+        } else {
+          console.error("Unexpected data format", result);
+          setData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setData([]);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleMoreClick = (alert: any) => {
     setSelectedAlert(alert);
-    setReview(alert.review);
+    setReview(alert.review || "");
     setIsOpen(true);
   };
 
   const handleReviewSubmit = () => {
     setData((prevData) =>
       prevData.map((item) =>
-        item.id === selectedAlert.id
+        item._id === selectedAlert._id
           ? { ...item, status: "Reviewed", reviewedBy: "Admin", review }
           : item
       )
@@ -109,20 +89,26 @@ export function AlertsTable({ className }: { className?: string }) {
         </TableHeader>
 
         <TableBody>
-          {data.map((alert, index) => (
-            <TableRow key={alert.id} className="text-center text-base font-medium text-dark dark:text-white">
-              <TableCell className="!text-left">{index + 1}</TableCell>
-              <TableCell>{alert.company}</TableCell>
-              <TableCell>{alert.location}</TableCell>
-              <TableCell>{alert.status}</TableCell>
-              <TableCell>{alert.reviewedBy || "-"}</TableCell>
-              <TableCell>{alert.alertedTime}</TableCell>
-              <TableCell className={alert.result === "Polluted" ? "text-red-500" : "text-green-500"}>{alert.result}</TableCell>
-              <TableCell>
-                <Button onClick={() => handleMoreClick(alert)}>More</Button>
-              </TableCell>
+          {Array.isArray(data) && data.length > 0 ? (
+            data.map((alert, index) => (
+              <TableRow key={alert._id} className="text-center text-base font-medium text-dark dark:text-white">
+                <TableCell className="!text-left">{index + 1}</TableCell>
+                <TableCell>{alert.company_name}</TableCell>
+                <TableCell>{alert.area}</TableCell>
+                <TableCell>{alert.status || "Pending"}</TableCell>
+                <TableCell>{alert.reviewedBy || "-"}</TableCell>
+                <TableCell>{alert.timestamp}</TableCell>
+                <TableCell className={alert.result === "Polluted" ? "text-red-500" : "text-green-500"}>{alert.result}</TableCell>
+                <TableCell>
+                  <Button onClick={() => handleMoreClick(alert)}>More</Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center">No data available</TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
 
@@ -134,25 +120,20 @@ export function AlertsTable({ className }: { className?: string }) {
           </DialogHeader>
           {selectedAlert && (
             <div>
-              <div className="bg-gray-100 p-4 rounded-md mb-4">
-                <p><strong>Company:</strong> {selectedAlert.company}</p>
-                <p><strong>Area/Location:</strong> {selectedAlert.location}</p>
-                <p><strong>Time:</strong> {selectedAlert.alertedTime}</p>
-                <p><strong>Reviewed By:</strong> {selectedAlert.reviewedBy}</p>
-                <p><strong>pH:</strong> {selectedAlert.pH}</p>
-                <p><strong>Turbidity:</strong> {selectedAlert.turbidity}</p>
-                <p><strong>ORP:</strong> {selectedAlert.orp}</p>
-                <p><strong>TSS:</strong> {selectedAlert.tss}</p>
-                <p><strong>DS:</strong> {selectedAlert.ds}</p>
-              </div>
-              <label className="block text-sm font-medium text-gray-700">Review</label>
+              <p><strong>Company:</strong> {selectedAlert.company_name}</p>
+              <p><strong>Area/Location:</strong> {selectedAlert.area}</p>
+              <p><strong>Alerted Time:</strong> {selectedAlert.timestamp}</p>
+              <p><strong>pH:</strong> {selectedAlert.ph}</p>
+              <p><strong>Turbidity:</strong> {selectedAlert.turbidity}</p>
+              <p><strong>TDS:</strong> {selectedAlert.tds}</p>
+              <label className="block text-sm font-medium text-gray-700 mt-3">Review</label>
               <Input value={review} onChange={(e) => setReview(e.target.value)} className="mb-3" />
-              <DialogFooter>
-                <Button variant="destructive" onClick={handleReviewSubmit}>Submit</Button>
-                <DialogClose className="bg-gray-500 text-white px-3 py-2 rounded">Close</DialogClose>
-              </DialogFooter>
             </div>
           )}
+          <DialogFooter>
+            <Button variant="destructive" onClick={handleReviewSubmit}>Submit Review</Button>
+            <DialogClose className="bg-gray-500 text-white px-3 py-2 rounded">Close</DialogClose>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

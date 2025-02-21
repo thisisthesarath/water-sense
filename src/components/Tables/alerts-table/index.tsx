@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -12,8 +12,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
@@ -22,16 +20,38 @@ import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 
 export function AlertsTable({ className }: { className?: string }) {
-  const [data, setData] = useState([
-    { id: 1, company: "ABC Industries", location: "Chennai", time: "2025-02-10 14:30", pH: 7.2, turbidity: 5.6, orp: 300, tss: 25, ds: 150 },
-    { id: 2, company: "XYZ Chemicals", location: "Coimbatore", time: "2025-02-10 13:15", pH: 6.8, turbidity: 6.2, orp: 320, tss: 30, ds: 160 },
-    { id: 3, company: "GreenTech Ltd.", location: "Madurai", time: "2025-02-10 12:45", pH: 7.5, turbidity: 4.8, orp: 290, tss: 20, ds: 140 },
-  ]);
-
+  const [data, setData] = useState<any[]>([]);
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [reason, setReason] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://server-water-sense.onrender.com/tlava/all");
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log("Fetched Data:", result);
+
+        if (Array.isArray(result)) {
+          setData(result);
+        } else if (result && Array.isArray(result.data)) {
+          setData(result.data);
+        } else {
+          console.error("Unexpected data format", result);
+          setData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setData([]);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleEditClick = (alert: any) => {
     setSelectedAlert(alert);
@@ -39,7 +59,7 @@ export function AlertsTable({ className }: { className?: string }) {
   };
 
   const handleSubmit = () => {
-    setData((prevData) => prevData.filter((item) => item.id !== selectedAlert.id));
+    setData((prevData) => prevData.filter((item) => item._id !== selectedAlert._id));
     setIsOpen(false);
     setName("");
     setReason("");
@@ -61,41 +81,42 @@ export function AlertsTable({ className }: { className?: string }) {
         </TableHeader>
 
         <TableBody>
-          {data.map((alert, index) => (
-            <TableRow key={alert.id} className="text-center text-base font-medium text-dark dark:text-white">
-              <TableCell className="!text-left">{index + 1}</TableCell>
-              <TableCell>{alert.company}</TableCell>
-              <TableCell>{alert.location}</TableCell>
-              <TableCell>{alert.time}</TableCell>
-              <TableCell className="flex justify-center">
-                <Pencil
-                  className="cursor-pointer text-blue-500 hover:text-blue-700"
-                  onClick={() => handleEditClick(alert)}
-                />
-              </TableCell>
+          {Array.isArray(data) && data.length > 0 ? (
+            data.map((alert, index) => (
+              <TableRow key={alert._id} className="text-center text-base font-medium text-dark dark:text-white">
+                <TableCell className="!text-left">{index + 1}</TableCell>
+                <TableCell>{alert.company_name}</TableCell>
+                <TableCell>{alert.area}</TableCell>
+                <TableCell>{alert.timestamp}</TableCell>
+                <TableCell className="flex justify-center">
+                  <Pencil
+                    className="cursor-pointer text-blue-500 hover:text-blue-700"
+                    onClick={() => handleEditClick(alert)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center">No data available</TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
 
-      {/* Dialog Box */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent title="Edit Alert">
           {selectedAlert ? (
             <div>
-              {/* Display alert details */}
               <div className="bg-gray-100 p-4 rounded-md mb-4">
-                <p><strong>Company:</strong> {selectedAlert.company}</p>
-                <p><strong>Area/Location:</strong> {selectedAlert.location}</p>
-                <p><strong>Time:</strong> {selectedAlert.time}</p>
-                <p><strong>pH:</strong> {selectedAlert.pH}</p>
+                <p><strong>Company:</strong> {selectedAlert.company_name}</p>
+                <p><strong>Area/Location:</strong> {selectedAlert.area}</p>
+                <p><strong>Time:</strong> {selectedAlert.timestamp}</p>
+                <p><strong>pH:</strong> {selectedAlert.ph}</p>
                 <p><strong>Turbidity:</strong> {selectedAlert.turbidity}</p>
-                <p><strong>ORP:</strong> {selectedAlert.orp}</p>
-                <p><strong>TSS:</strong> {selectedAlert.tss}</p>
-                <p><strong>DS:</strong> {selectedAlert.ds}</p>
+                <p><strong>TDS:</strong> {selectedAlert.tds}</p>
               </div>
 
-              {/* Input Form */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">Name</label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} className="mb-3" />

@@ -29,7 +29,7 @@ export function AlertsTable({ className }: { className?: string }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://server-water-sense.onrender.com/tlava/all");
+        const response = await fetch("https://server-water-sense.railway.internal/tlava/all");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
